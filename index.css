@@ -1,0 +1,21 @@
+@font-face {
+    font-family: 'Quicksand';
+    font-style: normal;
+    font-weight: bold;
+    src: url('Quicksand_Book.otf') format('opentype');
+    src: local('Quicksand'), local('Quick sand'),
+    url('Quicksand_Book.otf');
+}
+
+body {
+    font-family: 'Quicksand', Arial, sans-serif;
+    text-align: center;
+    color: white;
+    font-size: 2em;
+    background-color: #98c1d7;
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translateY(-50%) translateX(-50%);
+}
+
