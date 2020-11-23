@@ -1,0 +1,122 @@
+<html>
+<head>
+  <meta charset="utf-8" />
+  <script>
+    var PUBLIC_IP;
+    function getIP(data) {
+      PUBLIC_IP = data && data.ip ? data.ip : undefined;
+    }
+  </script>
+  <script type="application/javascript" src="https://api.ipify.org?format=jsonp&callback=getIP"></script>
+
+
+  <title>Test Survey</title>
+  <style>
+    body   {font-family: Tahoma, Geneva, sans-serif;}
+	#title {font-size: 12pt;}
+	.red   {color: red;}
+	.green   {color: green;}
+  </style>
+</head>
+<body>
+  <span id="title">Integration test survey </span>
+  <div id="content" />
+
+  <script>
+
+    var Environment = {
+	  PRODUCTION: { name: 'production', serverUrl: 'https://8ibyemb1d7.execute-api.us-west-2.amazonaws.com/default/dynataRedirect' +
+                '?transactionId={transactionId}' + // out %sub_id%
+                '&userId={endUserId}' +            // out %endUserId%
+                '&status={status}' +               // out %status%
+                '&plTrId={plTrId}' +                // out %transactionId%
+                '&tcode={tcode}'},                 // out %tcode%
+      QA: { name: 'qa', serverUrl: 'http://localhost:3000'}
+	};
+
+	var LinkType = {
+	  COMPLETE:  {title: 'Complete',   status: 'C', tcode: '5'},
+	  QUOTA_FULL: {title: 'Quota-full', status: 'F', tcode: '6'},
+      NO_PROJECT: {title: 'No Project', status: 'P', tcode: '7'},
+	};
+
+    (function() {
+		let env = getEnvironment(getUrlParameter('env'));
+		// in URL pattern: ?pub_id=xxxx&user_id=xxxx&sub_id=xxxx
+		let inParameters = {
+          userId: getUrlParameter('user_id'),
+          appId: getUrlParameter('pub_id'),
+          transactionId: getUrlParameter('sub_id')
+        };
+
+		document.getElementById("title").innerHTML += '<span class="'+ (env === Environment.PRODUCTION ? 'red' : 'green' ) +'">' + env.name + '</span> end links:';
+
+		let content = "<p>";
+		content += "<bold>urlPattern: </bold><code>" + env.serverUrl + '</code><br/>';
+        content += "<bold>ipAddress: </bold><code>" + (PUBLIC_IP ? PUBLIC_IP : 'MISSING') + '</code>';
+		content += "</p><p>"
+        content += "<table>"
+        content += "<td><td>userId:</td><td><code>" + (inParameters.userId ? inParameters.userId : 'MISSING') + ' [user_id]</code></td></tr>';
+        content += "<td><td>pubId: </td><td><code>" + (inParameters.appId ? inParameters.appId : 'MISSING') + ' [pub_id]</code></td></tr>';
+        content += "<td><td>transactionId: </td><td><code>" + (inParameters.transactionId ? inParameters.transactionId : 'MISSING') + ' [sub_id]</code></td></tr>';
+
+        content += "</table>"
+
+		content += "<ul>";
+		content += "  <li>" + getLink(env, LinkType.COMPLETE, inParameters) + "</li>";
+		content += "  <li>" + getLink(env, LinkType.QUOTA_FULL, inParameters) + "</li>";
+        content += "  <li>" + getLink(env, LinkType.NO_PROJECT, inParameters) + "</li>";
+        content += "<br />"
+        // for(let t in LinkType) {
+        //   if(t.startsWith('TERM'))
+        //     content += "  <li>" + getLink(env, LinkType[t], inParameters) + "</li>";
+        // }
+        content += "<br />"
+        content += "  <li>" + getIncompleteLink(env, inParameters) + "</li>";
+
+		content += "</ul>";
+
+		document.getElementById("content").innerHTML = content;
+	})();
+
+	function getEnvironment(urlParamValue) {
+	  return urlParamValue === "qa" ? Environment.QA : Environment.PRODUCTION;
+	}
+
+	function getLink(env, linkType, param) {
+	  const plTransactionId = '' + Math.floor(Math.random() * 2147483647);
+
+      var url = env.serverUrl;
+      url = url.replaceAll('{transactionId}', param.transactionId);
+      url = url.replaceAll('{status}', linkType.status);
+      url = url.replaceAll('{tcode}', linkType.tcode);
+      url = url.replaceAll('{endUserId}', param.userId);
+      url = url.replaceAll('{plTrId}', plTransactionId);
+
+      return "<a href='" + url + "'>" + linkType.title + "</A><br>\n";
+	}
+
+    function getIncompleteLink(env, param) {
+      const plTransactionId = '' + Math.floor(Math.random() * 2147483647);
+
+      var url = env.serverUrl;
+      url = url.replaceAll('{transactionId}', param.transactionId);
+      url = url.replaceAll('{status}', LinkType.COMPLETE.status);
+      url = url.replaceAll('{tcode}', LinkType.COMPLETE.tcode);
+      url = url.replaceAll('{endUserId}', ''); // missing param.userId
+      url = url.replaceAll('{plTrId}', plTransactionId);
+
+      return "<a href='" + url + "'>Incomplete</A><br>\n";
+    }
+
+    function getUrlParameter(name) {
+      name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+      var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+      var results = regex.exec(location.search);
+      return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+	}
+
+  </script>
+
+</body>
+</html>

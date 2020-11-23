@@ -1,0 +1,16 @@
+{
+  "queryStringParameters": {
+    "status": "C",
+    "transactionId": "35273862",
+    "subId": "0dd40aa6-2a21-11eb-8be5-ed42501bf416",
+    "userId": "1603909289",
+    "tcode": "3"
+  }
+}
+
+
+'?transactionId={transactionId}' + // out %sub_id%
+'&userId={endUserId}' +            // out %endUserId%
+'&status={status}' +               // out %status%
+'&plTrId={plTrId}' +                // out %transactionId%
+'&tcode={tcode}'},                 // out %tcode%

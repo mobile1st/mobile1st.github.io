@@ -1,0 +1,23 @@
+{
+  "queryStringParameters": {
+    "cmd": "transactionComplete",
+    "userId": "User123-10598-35cd9bb1c1",
+    "amt": "100",
+    "offerInvitationId": "1234",
+    "status": "C",
+    "oidHash": "106fe8725a8a0439e9413208b8298fd3",
+    "currencyAmt": "10000",
+    "transactionId": "4321",
+    "endUserId": "User123",
+    "offerTitle": "TestProject",
+    "useragent": "Peanut+Labs+Media",
+    "profiler": "",
+    "currencyName": "Points",
+    "offerType": "Survey",
+    "txnHash": "ebc3bfa36bd405d59e88e4327f8a820b",
+    "program": "Points",
+    "transactionSource": "directlink",
+    "surveyId": "c070d427c90a565f004b24ae9e7353ac",
+    "sub_id": "0dd40aa6-2a21-11eb-8be5-ed42501bf416"
+  }
+}
