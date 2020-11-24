@@ -1,6 +1,7 @@
 <html>
 <head>
   <meta charset="utf-8" />
+  <link rel="stylesheet" href="style.css" />
   <script>
     var PUBLIC_IP;
     function getIP(data) {
@@ -25,12 +26,34 @@
   <script>
 
     var Environment = {
-	  PRODUCTION: { name: 'production', serverUrl: 'https://8ibyemb1d7.execute-api.us-west-2.amazonaws.com/default/dynataRedirect' +
+	  PRODUCTION: {
+        name: 'production',
+        serverUrl: 'https://8ibyemb1d7.execute-api.us-west-2.amazonaws.com/default/dynataRedirect' +
                 '?transactionId={transactionId}' + // out %sub_id%
                 '&userId={endUserId}' +            // out %endUserId%
                 '&status={status}' +               // out %status%
                 '&plTrId={plTrId}' +                // out %transactionId%
-                '&tcode={tcode}'},                 // out %tcode%
+                '&tcode={tcode}',                 // out %tcode%
+        callbackUrl: 'https://zrj7q791uc.execute-api.us-west-2.amazonaws.com/default/peanutCallback' +
+                '?cmd=transactionComplete' +
+                '&userId=user123-9370-d163590aa9' +
+                '&amt=100' + // USD
+                '&offerInvitationId=1234' +
+                '&status={status}' +
+                '&oiHash=2ef1130cca32cd030141d8935dec0992' +
+                '&currencyAmt=20000' +
+                '&transactionId={plTrId}' +
+                '&endUserId={endUserId}' +
+                '&offerTitle=TestProject' +
+                '&useragent=Peanut+Labs+Media' +
+                '&profiler=' +
+                '&currencyName=coins' +
+                '&offerType=survey' +
+                '&txnHash=66a2b2987083666c76592d505240748e' +
+                '&program=' +
+                '&transactionSource=iframe' +
+                '&sub_id={transactionId}'
+      },
       QA: { name: 'qa', serverUrl: 'http://localhost:3000'}
 	};
 
@@ -93,7 +116,13 @@
       url = url.replaceAll('{endUserId}', param.userId);
       url = url.replaceAll('{plTrId}', plTransactionId);
 
-      return "<a href='" + url + "'>" + linkType.title + "</A><br>\n";
+      var callbackUrl = env.callbackUrl;
+      callbackUrl = callbackUrl.replaceAll('{transactionId}', param.transactionId);
+      callbackUrl = callbackUrl.replaceAll('{status}', linkType.status);
+      callbackUrl = callbackUrl.replaceAll('{endUserId}', param.userId);
+      callbackUrl = callbackUrl.replaceAll('{plTrId}', plTransactionId);
+
+      return "<a onclick='sendTo(\"" + url + "\",\"" + callbackUrl + "\"); return false;'>" + linkType.title + "</A><br>\n";
 	}
 
     function getIncompleteLink(env, param) {
@@ -106,7 +135,13 @@
       url = url.replaceAll('{endUserId}', ''); // missing param.userId
       url = url.replaceAll('{plTrId}', plTransactionId);
 
-      return "<a href='" + url + "'>Incomplete</A><br>\n";
+      var callbackUrl = env.callbackUrl;
+      callbackUrl = callbackUrl.replaceAll('{transactionId}', param.transactionId);
+      callbackUrl = callbackUrl.replaceAll('{status}', LinkType.COMPLETE.status);
+      callbackUrl = callbackUrl.replaceAll('{endUserId}', param.userId);
+      callbackUrl = callbackUrl.replaceAll('{plTrId}', plTransactionId);
+
+      return "<a onclick='sendTo(\"" + url + "\",\"" + callbackUrl + "\"); return false;'>Incomplete</A><br>\n";
     }
 
     function getUrlParameter(name) {
@@ -115,6 +150,18 @@
       var results = regex.exec(location.search);
       return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
 	}
+
+	function sendTo(url, callbackUrl) {
+	  fetch(callbackUrl, { mode: 'no-cors'})
+        .then(response => {
+          console.log(response);
+          window.location.replace(url);
+        })
+        .catch(response => {
+          console.log(response);
+          window.location.replace(url);
+        });
+    }
 
   </script>
 
